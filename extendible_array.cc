@@ -1,5 +1,3 @@
-#include "extendible_array.h"
-
 template<typename T>
 int ExtendibleArray<T>::extend_index_block(){
   void* reall = NULL;
@@ -90,18 +88,22 @@ int ExtendibleArray<T>::shrink(int n) {
   if ( n > capacity ){
     return BAD_INPUT;
   }
+  int final_n_elm = number_of_elements - n;
   while ( n > 0 ){
     int elm_in_last_block = index_block_used_sp - (capacity - 
                                                    number_of_elements);
     if ( elm_in_last_block > n ){
-      number_of_elements -= n;
-      memset(index_block[index_block_used_sp-1]+elm_in_last_block-n,0,n);
+      number_of_elements = final_n_elm;
       return FINE;
     }
     free(index_block[index_block_used_sp-1]);
+    capacity -= index_block_used_sp;
+    index_block[index_block_used_sp-1] = NULL;
     index_block_used_sp -= 1;
-    n -= index_block_used_sp;
+    n -= elm_in_last_block;
+    number_of_elements -= elm_in_last_block;
   }
+  //number_of_elements = final_n_elm;
   return FINE;
 }
 template<typename T>
@@ -123,3 +125,6 @@ T& ExtendibleArray<T>::operator[](unsigned int idx) {
   p = (T *) index_block[i_block];
   return p[idx_in_block];
 }
+
+
+

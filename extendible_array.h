@@ -1,3 +1,5 @@
+/*
+ */
 #ifndef EXTENDIBLE_ARRAY
 #define EXTENDIBLE_ARRAY
 
@@ -28,5 +30,7 @@ public:
   int shrink(int n);
   T& operator[](unsigned int idx);
 };
+
+#include "extendible_array.cc"
 
 #endif
