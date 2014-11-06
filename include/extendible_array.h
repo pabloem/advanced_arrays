@@ -32,6 +32,6 @@ public:
   T& operator[](unsigned int idx);
 };
 
-#include "extendible_array.cc"
+#include "../src/extendible_array.cc"
 
 #endif
