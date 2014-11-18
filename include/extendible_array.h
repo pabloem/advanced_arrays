@@ -1,7 +1,21 @@
-/*
- */
 #ifndef EXTENDIBLE_ARRAY
 #define EXTENDIBLE_ARRAY
+
+/* ExtendibleArray class
+   The class provides O(1) amortized access to an array, as well as 
+   O(sqrt(n)) extra space, as opposed to the standard implementation
+   of Vector that has O(n) extra space.
+   This is achieved by constructing a series of arrays indexed by a
+   single index array, as follows:
+
+   INDEX BLOCK: |_______|
+   BLOCKS:       |->|_|      (Len: 1)
+                 |->|__|     (Len: 2)
+                 |->|___|    (Len: 3)
+                ...........
+                 |->|__________| (Len: sqrt(n))
+
+ */
 
 #define FINE 0
 #define FAIL_TO_ALLOC 1
