@@ -33,6 +33,12 @@ ExtendibleArray<T>::ExtendibleArray(unsigned int n/* = 0*/) {
 }
 
 template<typename T>
+ExtendibleArray<T>::~ExtendibleArray(){
+  shrink(number_of_elements);
+  free(index_block);
+}
+
+template<typename T>
 int ExtendibleArray<T>::memory_footprint(){
   int size_in_memory = 0;
   size_in_memory += index_block_size*sizeof(void*);

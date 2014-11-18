@@ -4,6 +4,25 @@
 #include "../include/extendible_array.h"
 
 #define PRIME_SDD 6143
+#define c 1
+#define sM_factor 2
+
+#define MAX(X,Y) (((X)>(Y)) ? (X):(Y))
+
+int Hash(long int key, int k){
+  return (key*k)%PRIME_SDD;
+}
+
+template <typename T>
+class LittleHashTable{
+public:
+  int k;
+  int n;
+  int elms;
+  ExtendibleArray<T> table;
+
+  LittleHashTable(int arr_sz);
+};
 
 template <typename T>
 class DynamicPerfectHash{
@@ -11,18 +30,19 @@ private:
   int k;
   int generate_k();
 
-  unsigned int M;
+  long unsigned int M;
+  long unsigned int count;
+  int sM;
 
   int rehash_all();
-
-  ExtendibleArray<ExtendibleArray<T>*> table; // Initially implementing for long int
-  int Hash(int key,int k);
+  ExtendibleArray<LittleHashTable<T>*> table; // Initially implementing for long int
+  //  int Hash(int key);
 public:
   DynamicPerfectHash(unsigned int init_sz = 0, 
                         unsigned int sizeof_universe);
-  int insert(int id, T elm);
-  T& lookup(int id);
-  int remove(int id);
+  int insert(T elm);
+  int lookup(T elm);
+  int remove(T elm);
 };
 
 /*
@@ -40,22 +60,40 @@ int DynamicPerfectHash<T>::generate_k(){
 }
 
 template<typename T>
+DynamicPerfectHash<T>::rehash_all(){
+  T* elms = (T*) malloc(count*sizeof(T));
+  /* Put all elements in elms array. */
+  for (int i = 0; i < count; i ++){
+    T* each_el = get_next_elm();
+    memcpy(each_el,elms+i,sizeof(T));
+  }
+
+  /*
+    TODO: Clean up all the old structures - 
+    Specifically, the LittleHashTable objects.
+   */
+
+  M = (1+c)*MAX(4,count);
+  k = generate_k();
+  sM = M*sM_factor;
+  table.grow(sM-table.number_of_elements);
+}
+
+template<typename T>
 DynamicPerfectHash<T>::DynamicPerfectHash(unsigned int initial_size /*=0*/,
                                                 unsigned int sizeof_universe){
-  number_of_elements = 0;
-  k = generate_k();
+  count = 0;
+  rehash_all();
 }
 
 template<typename T>
-int DynamicPerfectHash<T>::insert(int id, T elm){
-  int hash = Hash(id);
-  number_of_elements += 1;
-
-}
-
-template<typename T>
-int DynamicPerfectHash<T>::Hash(int id){
-  return number_of_elements;
+int DynamicPerfectHash<T>::insert(T elm){
+  int hash = Hash((long int)elm,k)%sM;
+  count += 1;
+  if ( count > M ){
+    rehash_all(); /* TODO insert element */
+    return FINE;
+  }
 }
 
 #endif

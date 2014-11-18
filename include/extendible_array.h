@@ -38,6 +38,7 @@ private:
 public:
   unsigned int number_of_elements;
   ExtendibleArray(unsigned int n = 0);
+  ~ExtendibleArray();
   int memory_footprint();
   void print();
   void print_to_f(FILE* f);

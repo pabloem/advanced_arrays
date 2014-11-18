@@ -4,7 +4,7 @@
 #include "../include/extendible_array.h"
 
 template <typename T>
-class SuccDynamicDictionary{
+class SuccDynamicDict{
 private:
 
 public:
