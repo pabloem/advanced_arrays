@@ -17,9 +17,7 @@
 
  */
 
-#define FINE 0
-#define FAIL_TO_ALLOC 1
-#define BAD_INPUT 2
+#include "advanced_arrays.h"
 
 #include <string.h>
 #include <stdlib.h>
@@ -45,6 +43,7 @@ public:
   int grow(int n);
   int shrink(int n);
   T& operator[](unsigned int idx);
+  int setzeros();
 };
 
 #include "../src/extendible_array.cc"

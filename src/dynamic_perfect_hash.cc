@@ -1,28 +1,11 @@
 #ifndef DYNAMIC_PERF_HASH
 #define DYNAMIC_PERF_HASH
 
+#include "../include/advanced_arrays.h"
 #include "../include/extendible_array.h"
 
-#define PRIME_SDD 6143
 #define c 1
 #define sM_factor 2
-
-#define MAX(X,Y) (((X)>(Y)) ? (X):(Y))
-
-int Hash(long int key, int k){
-  return (key*k)%PRIME_SDD;
-}
-
-template <typename T>
-class LittleHashTable{
-public:
-  int k;
-  int n;
-  int elms;
-  ExtendibleArray<T> table;
-
-  LittleHashTable(int arr_sz);
-};
 
 template <typename T>
 class DynamicPerfectHash{

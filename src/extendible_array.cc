@@ -29,13 +29,13 @@ ExtendibleArray<T>::ExtendibleArray(unsigned int n/* = 0*/) {
   
   if ( n > 0 ){
     grow(n);
+    setzeros();
   }
 }
 
 template<typename T>
 ExtendibleArray<T>::~ExtendibleArray(){
   shrink(number_of_elements);
-  free(index_block);
 }
 
 template<typename T>
@@ -111,7 +111,7 @@ int ExtendibleArray<T>::shrink(int n) {
                                                    number_of_elements);
     if ( elm_in_last_block > n ){
       number_of_elements = final_n_elm;
-      return FINE;
+      goto end;
     }
     free(index_block[index_block_used_sp-1]);
     index_block[index_block_used_sp-1] = NULL;
@@ -120,8 +120,11 @@ int ExtendibleArray<T>::shrink(int n) {
     number_of_elements -= elm_in_last_block;
   }
   //number_of_elements = final_n_elm;
+ end:
+  if (number_of_elements == 0) free(index_block);
   return FINE;
 }
+
 template<typename T>
 T& ExtendibleArray<T>::operator[](unsigned int idx) {
   float f_block;
@@ -142,5 +145,10 @@ T& ExtendibleArray<T>::operator[](unsigned int idx) {
   return p[idx_in_block];
 }
 
-
-
+template<typename T>
+int ExtendibleArray<T>::setzeros(){
+  for (int i = 0; i < index_block_used_sp; i++){
+    void* arr = index_block[i];
+    memset(arr,0,(i+1)*sizeof(T));
+  }
+}
