@@ -42,7 +42,9 @@ int DynamicPerfectHash<T>::rehash_all(T ins, bool add){
   sM = M*sM_factor;
 
   /* 
-     Allocate - or reallocate the big hash table, containing the Little ones */
+     Allocate - or reallocate the big hash table, containing the Little ones. 
+     The LittleHashTable elements are allocated lazily - only when they become
+     necessary. */
   if ( table == NULL ){
     table = (void **) malloc(sizeof(void*)*sM);
     memset(table,0,sizeof(void*)*sM);
@@ -77,7 +79,8 @@ int DynamicPerfectHash<T>::insert(T elm, bool force){
   int hash = Hash((long int)elm,k)%sM;
   LittleHashTable<T> *lht = (LittleHashTable<T> *) table[hash];
   if ( lht == NULL ){
-    /* TODO
+    /* Lazy creation of LittleHashTable : )
+       TODO
        detail this new declaration */
     lht = new LittleHashTable<T>(0,generate_k());
     table[hash] = lht;

@@ -21,7 +21,6 @@ public:
   int insert(R elm, bool force=false);
   int lookup(R elm);
   int remove(R elm);
-  int set_k(int in_k);
   int len();
   int elems_to_buffer(R* buffer);
 };
