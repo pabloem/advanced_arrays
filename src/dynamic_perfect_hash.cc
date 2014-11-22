@@ -11,39 +11,24 @@ template <typename T>
 class DynamicPerfectHash{
 private:
   int k;
-  int generate_k();
 
   long unsigned int M;
   long unsigned int count;
   int sM;
 
   int rehash_all();
-  ExtendibleArray<LittleHashTable<T>*> table; // Initially implementing for long int
-  //  int Hash(int key);
+  void **table;
+  //LittleHashTable<T>* table; // Initially implementing for long int
 public:
   DynamicPerfectHash(unsigned int init_sz = 0, 
                         unsigned int sizeof_universe);
-  int insert(T elm);
+  int insert(T elm, bool force=false);
   int lookup(T elm);
   int remove(T elm);
 };
 
-/*
-  Function generate_k()
-  Returns: This function returns the value of K such that 0<=K<=PRIME_SDD.
-  K is calculated at random, but in this case it uses modulo operator over
-  the rand() function. This makes elements at the beginning more likely.
-
-  === TODO: A more robust implementation of generate_k() ===
- */
-#include <cstdlib>
 template<typename T>
-int DynamicPerfectHash<T>::generate_k(){
-  return rand() % PRIME_SDD;
-}
-
-template<typename T>
-DynamicPerfectHash<T>::rehash_all(){
+int DynamicPerfectHash<T>::rehash_all(){
   T* elms = (T*) malloc(count*sizeof(T));
   /* Put all elements in elms array. */
   for (int i = 0; i < count; i ++){
@@ -58,8 +43,14 @@ DynamicPerfectHash<T>::rehash_all(){
 
   M = (1+c)*MAX(4,count);
   k = generate_k();
-  sM = M*sM_factor;
-  table.grow(sM-table.number_of_elements);
+  sM = M*sM_facto;
+  //table.grow(sM-table.number_of_elements);
+  if ( table == NULL ){
+    table = malloc(sizeof(void*)*sM);
+  }
+  else {
+    table = realloc(table,sizeof(void*)*sM);
+  }
 }
 
 template<typename T>
@@ -70,13 +61,32 @@ DynamicPerfectHash<T>::DynamicPerfectHash(unsigned int initial_size /*=0*/,
 }
 
 template<typename T>
-int DynamicPerfectHash<T>::insert(T elm){
-  int hash = Hash((long int)elm,k)%sM;
+int DynamicPerfectHash<T>::insert(T elm, bool force){
   count += 1;
   if ( count > M ){
     rehash_all(); /* TODO insert element */
     return FINE;
   }
+  int hash = Hash((long int)elm,k)%sM;
+  LittleHashTable<T> *lht = (LittleHashTable<T> *) *(table+hash);
+  return lht->insert(elm,force);
+}
+
+template<typename T>
+int DynamicPerfectHash<T>::lookup(T elm){
+  int hash = Hash((long int) elm,k)%sM;
+  count -= 1;
+  LittleHashTable<T> *lht = (LittleHashTable<T> *) *(table+hash);
+
+  return lht->lookup(elm);
+}
+
+template<typename T>
+int DynamicPerfectHash<T>::remove(T elm){
+  int hash = Hash((long int) elm,k)%sM;
+  LittleHashTable<T> *lht = (LittleHashTable<T> *) *(table+hash);
+
+  return lht->remove(elm);
 }
 
 #endif

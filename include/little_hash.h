@@ -6,17 +6,21 @@
 
 template <typename R>
 class LittleHashTable{
-public:
+private:
   int k;
   int n;
   int elms;
+  int reshuffle(R ins);
+
   ExtendibleArray<R> *table;
 
+public:
   LittleHashTable(int arr_sz, int in_k);
   ~LittleHashTable();
-  int insert(R elm);
+  int insert(R elm, bool force=false);
   int lookup(R elm);
   int remove(R elm);
+  int set_k(int in_k);
 };
 
 #include "../src/little_hash.cc"
