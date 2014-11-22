@@ -10,6 +10,23 @@ LittleHashTable<R>::~LittleHashTable(){
   table->shrink(table->number_of_elements);
 }
 
+template <typename R>
+int LittleHashTable<R>::cleanup(){
+  table->setzeros();
+  return FINE;
+}
+
+template <typename R>
+int LittleHashTable<R>::elems_to_buffer(R* buffer){
+  int el_idx = 0;
+  for(int i = 0; i < n; i++){
+    if( (*table)[i] != 0 ){
+      buffer[el_idx] = (*table)[i];
+      el_idx += 1;
+    }
+  }
+  return el_idx;
+}
 
 #define MAX_RESHUFLES 50
 template <typename R>
@@ -17,12 +34,10 @@ int LittleHashTable<R>::reshuffle(R ins){
   R* el_lst = (R*) malloc(sizeof(R)*(elms+1));
   int el_idx = 0;
 
-  for(int i = 0; i < n; i++){
-    if( (*table)[i] != 0 ){
-      el_lst[el_idx] = (*table)[i];
-      el_idx += 1;
-    }
-  }
+  /* Now we copy the elements stored in the table to a buffer
+     to keep them later on */
+  el_idx = elems_to_buffer(el_lst);
+
   el_lst[el_idx] = ins;
   el_idx += 1;
 
@@ -59,6 +74,11 @@ int LittleHashTable<R>::reshuffle(R ins){
   fprintf(stderr,"MAXIMUM RESHUFLES\n");
   free(el_lst);
   return COLLISION;
+}
+
+template <typename R>
+int LittleHashTable<R>::len(){
+  return n;
 }
 
 template <typename R>

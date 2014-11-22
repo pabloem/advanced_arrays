@@ -1,5 +1,7 @@
 ###Advanced arrays
 Author: Pablo Estrada < pablo(at)snu ( dot) ac (d0t) kr >
+Bugs, feature requests and pull requests are all welcome. Thanks : )
+
 This repo comes from my project to implement the algorithms described in the
 following two papers:
 

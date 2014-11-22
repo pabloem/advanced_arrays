@@ -1,62 +1,70 @@
-#ifndef DYNAMIC_PERF_HASH
-#define DYNAMIC_PERF_HASH
-
-#include "../include/advanced_arrays.h"
-#include "../include/extendible_array.h"
-
-#define c 1
-#define sM_factor 2
+template <typename T>
+int DynamicPerfectHash<T>::copy_elements(T* el_lst, T ins){
+  int el_idx = 0;
+  for(int i = 0; i < sM; i++){
+    LittleHashTable<T> *lht = (LittleHashTable<T> *) table[i];
+    int el_num = lht->elems_to_buffer(el_lst+el_idx);
+    el_idx += el_num;
+  }
+  el_lst[el_idx] = ins;
+  return FINE;
+}
 
 template <typename T>
-class DynamicPerfectHash{
-private:
-  int k;
-
-  long unsigned int M;
-  long unsigned int count;
-  int sM;
-
-  int rehash_all();
-  void **table;
-  //LittleHashTable<T>* table; // Initially implementing for long int
-public:
-  DynamicPerfectHash(unsigned int init_sz = 0, 
-                        unsigned int sizeof_universe);
-  int insert(T elm, bool force=false);
-  int lookup(T elm);
-  int remove(T elm);
-};
-
-template<typename T>
-int DynamicPerfectHash<T>::rehash_all(){
-  T* elms = (T*) malloc(count*sizeof(T));
-  /* Put all elements in elms array. */
-  for (int i = 0; i < count; i ++){
-    T* each_el = get_next_elm();
-    memcpy(each_el,elms+i,sizeof(T));
+int DynamicPerfectHash<T>::cleanup(){
+  for ( int i = 0; i < sM; i ++){
+    LittleHashTable<T> *lht = (LittleHashTable<T> *) table[i];
+    lht->cleanup();
   }
-
-  /*
-    TODO: Clean up all the old structures - 
-    Specifically, the LittleHashTable objects.
-   */
-
-  M = (1+c)*MAX(4,count);
-  k = generate_k();
-  sM = M*sM_facto;
-  //table.grow(sM-table.number_of_elements);
-  if ( table == NULL ){
-    table = malloc(sizeof(void*)*sM);
-  }
-  else {
-    table = realloc(table,sizeof(void*)*sM);
-  }
+  return FINE;
 }
 
 template<typename T>
-DynamicPerfectHash<T>::DynamicPerfectHash(unsigned int initial_size /*=0*/,
-                                                unsigned int sizeof_universe){
+int DynamicPerfectHash<T>::rehash_all(T ins, bool add){
+  T* elms = (T*) malloc((count+1)*sizeof(T));
+  /* Put all elements in elms array. */
+  copy_elements(elms,ins);
+
+  /*
+    Clean up all the old structures - 
+    Specifically, the LittleHashTable objects. */
+  cleanup();
+
+  /*
+    Now we go and calculate the new numbers to resize the hash table. 
+    We keep the previous ones, to add the new structures. */
+  int pre_sM = sM;
+  int tot_count = count+(int)add;
+
   count = 0;
+  M = (int) (1+c)*MAX(4,tot_count);
+  k = generate_k();
+  sM = M*sM_factor;
+
+  /* 
+     Allocate - or reallocate the big hash table, containing the Little ones */
+  if ( table == NULL ){
+    table = (void **) malloc(sizeof(void*)*sM);
+    memset(table,0,sizeof(void*)*sM);
+  }
+  else {
+    table = (void **) realloc(table,sizeof(void*)*sM);
+    memset(table+pre_sM,0,sizeof(void*)*sM);
+  }
+
+  for(int i = 0; i < tot_count; i ++){
+    int res = insert(elms[i],true);
+    /* We are never supposed to experience a collision here */
+    assert( res != COLLISION );
+  }
+  return FINE;
+}
+
+template<typename T>
+DynamicPerfectHash<T>::DynamicPerfectHash(){
+  count = 0;
+  sM = 0;
+  M = 0;
   rehash_all();
 }
 
@@ -64,11 +72,16 @@ template<typename T>
 int DynamicPerfectHash<T>::insert(T elm, bool force){
   count += 1;
   if ( count > M ){
-    rehash_all(); /* TODO insert element */
-    return FINE;
+    return rehash_all(elm,true); /* TODO insert element */
   }
   int hash = Hash((long int)elm,k)%sM;
-  LittleHashTable<T> *lht = (LittleHashTable<T> *) *(table+hash);
+  LittleHashTable<T> *lht = (LittleHashTable<T> *) table[hash];
+  if ( lht == NULL ){
+    /* TODO
+       detail this new declaration */
+    lht = new LittleHashTable<T>(0,generate_k());
+    table[hash] = lht;
+  }
   return lht->insert(elm,force);
 }
 
@@ -88,5 +101,3 @@ int DynamicPerfectHash<T>::remove(T elm){
 
   return lht->remove(elm);
 }
-
-#endif

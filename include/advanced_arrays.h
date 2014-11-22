@@ -28,4 +28,5 @@ int generate_k(){
   return rand() % PRIME_SDD;
 }
 
+#include <assert.h>
 #endif
