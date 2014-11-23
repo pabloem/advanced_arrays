@@ -31,5 +31,11 @@ described by Raman, Rajeev and Rao in their paper.
 To test this project, one can individually compile and run the C programs contained in the test
 directory. All these programs contain explanatory output that should reasonably explain what's
 going on.
-In a future update, I'll add a more feature-rich testing script implemented in python, that will
-run all the tests, and compare their output with the expected results.
+The automatic way to test the framework is using the  more feature-rich testing script
+provided: ```run_tests.py```. It is implemented in python.
+
+```$> ./run_tests.py```
+
+This will run all the tests that have been configured to be run; the output will be
+redirected to a file, and compared with the expected masterfile. Any discrepancies
+will be reported.
