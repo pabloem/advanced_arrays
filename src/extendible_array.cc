@@ -102,7 +102,7 @@ int ExtendibleArray<T>::grow(int n) {
 
 template<typename T>
 int ExtendibleArray<T>::shrink(int n) {
-  if ( n > number_of_elements ){
+  if ( n > number_of_elements || number_of_elements == 0){
     return BAD_INPUT;
   }
   int final_n_elm = number_of_elements - n;
