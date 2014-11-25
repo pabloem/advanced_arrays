@@ -44,6 +44,9 @@ public:
   int shrink(int n);
   T& operator[](unsigned int idx);
   int setzeros();
+
+  int push(T elm);
+  T pop();
 };
 
 #include "../src/extendible_array.cc"

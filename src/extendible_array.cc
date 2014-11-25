@@ -1,4 +1,18 @@
 template<typename T>
+int ExtendibleArray<T>::push(T elm){
+  grow(1);
+  operator[](number_of_elements-1) = elm;
+  return FINE;
+}
+
+template<typename T>
+T ExtendibleArray<T>::pop(){
+  T res = operator[](number_of_elements-1);
+  shrink(1);
+  return res;
+}
+
+template<typename T>
 int ExtendibleArray<T>::extend_index_block(){
   void* reall = NULL;
   if ( index_block != NULL ){

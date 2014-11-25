@@ -9,7 +9,8 @@ from os.path import isfile
 class AdvancedArraysTest:
     version = "0.1"
     av_tests = ["lit_hash_extensive.cc","ext_arr_random_shgr.cc",
-                "ext_arr_vanilla_test.cc","ext_arr_test_shrink.cc"]
+                "ext_arr_vanilla_test.cc","ext_arr_test_shrink.cc",
+                "ext_arr_pushpop.cc"]
 
     def __init__(self,outfile,errfile,mast_file = 'output_masterfile'):
         self.of = open(outfile,'w')
@@ -77,7 +78,7 @@ class AdvancedArraysTest:
         print("Matching diffs...")
         try:
             subprocess.check_output(["diff", 
-                                            "-I","Time\|0x[0-9a-f]*",
+                                            "-I","Removing\|Time\|0x[0-9a-f]*",
                                             master_file, output_file])
         except subprocess.CalledProcessError, e:
             print("=========================")
