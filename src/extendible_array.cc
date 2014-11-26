@@ -7,6 +7,9 @@ int ExtendibleArray<T>::push(T elm){
 
 template<typename T>
 T ExtendibleArray<T>::pop(){
+  if (number_of_elements == 0){
+    return (T) NULL; //TODO find a better way to handle this error
+  }
   T res = operator[](number_of_elements-1);
   shrink(1);
   return res;
@@ -50,6 +53,7 @@ ExtendibleArray<T>::ExtendibleArray(unsigned int n/* = 0*/) {
 template<typename T>
 ExtendibleArray<T>::~ExtendibleArray(){
   shrink(number_of_elements);
+  if(index_block) free(index_block);
 }
 
 template<typename T>
@@ -135,7 +139,9 @@ int ExtendibleArray<T>::shrink(int n) {
   }
   //number_of_elements = final_n_elm;
  end:
-  if (number_of_elements == 0) free(index_block);
+  /*  if (number_of_elements == 0){
+    free(index_block);
+    }*/
   return FINE;
 }
 

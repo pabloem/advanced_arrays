@@ -10,7 +10,7 @@ class AdvancedArraysTest:
     version = "0.1"
     av_tests = ["lit_hash_extensive.cc","ext_arr_random_shgr.cc",
                 "ext_arr_vanilla_test.cc","ext_arr_test_shrink.cc",
-                "ext_arr_pushpop.cc"]
+                "ext_arr_pushpop.cc","dph_basic.cc"]
 
     def __init__(self,outfile,errfile,mast_file = 'output_masterfile'):
         self.of = open(outfile,'w')

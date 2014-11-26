@@ -11,6 +11,7 @@ private:
   int n;
   int elms;
   int reshuffle(R ins);
+  int resize();
 
   ExtendibleArray<R> *table;
 
@@ -22,7 +23,7 @@ public:
   int lookup(R elm);
   int remove(R elm);
   int len();
-  int elems_to_buffer(R* buffer);
+  int elems_to_buffer(ExtendibleArray<R>* buffer);
 };
 
 #include "../src/little_hash.cc"

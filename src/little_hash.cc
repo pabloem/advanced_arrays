@@ -8,6 +8,7 @@ LittleHashTable<R>::LittleHashTable(int arr_sz, int in_k){
 template <typename R>
 LittleHashTable<R>::~LittleHashTable(){
   table->shrink(table->number_of_elements);
+  delete table;
 }
 
 template <typename R>
@@ -19,13 +20,30 @@ int LittleHashTable<R>::cleanup(){
 }
 
 template <typename R>
-int LittleHashTable<R>::elems_to_buffer(R* buffer){
+int LittleHashTable<R>::resize(){
+  /*
+    This function increases the size of the table array, and reinserts 
+    all elements from the elms array. */
+  int new_size = 2*n*(n-1);
+  printf("RESIZING - SZ:%d NWS: %d\n",n,new_size);
+
+  int ea_szdf = new_size - table->number_of_elements;
+  table->grow(ea_szdf);
+  table->setzeros(); // This step might not be necessary
+  k = generate_k();
+  n = new_size;
+
+  return FINE;
+}
+
+template <typename R>
+int LittleHashTable<R>::elems_to_buffer(ExtendibleArray<R>* buffer){
   /* Copies all the elements contained in the hash table to a contiguous
      buffer in memory. */
   int el_idx = 0;
   for(int i = 0; i < n; i++){
     if( (*table)[i] != 0 ){
-      buffer[el_idx] = (*table)[i];
+      buffer->push((*table)[i]);
       el_idx += 1;
     }
   }
@@ -33,6 +51,7 @@ int LittleHashTable<R>::elems_to_buffer(R* buffer){
 }
 
 #define MAX_RESHUFLES 50
+#define RESIZE_ROUND MAX_RESHUFLES-1
 template <typename R>
 int LittleHashTable<R>::reshuffle(R ins){
   /* Input: The new element to insert
@@ -45,48 +64,56 @@ int LittleHashTable<R>::reshuffle(R ins){
      we attempt to fix the issue by copying all the elements to a buffer,
      updating to a new K, and retrying the insertion of all the elements */
 
-  R* el_lst = (R*) malloc(sizeof(R)*(elms+1));
+  ExtendibleArray<R>* el_lst = new ExtendibleArray<R>();
   int el_idx = 0;
 
   /* Now we copy the elements stored in the table to the el_lst buffer
      to re-insert them later on */
   el_idx = elems_to_buffer(el_lst);
 
-  el_lst[el_idx] = ins;
-  el_idx += 1;
+  el_lst->push(ins);
 
   int original_k = k;
   int res = 0;
   int res_count = 0;
+  bool resized = false;
+
   while(true){
     table->setzeros();
     k = generate_k();
     elms = 0;
-    if ( res_count == MAX_RESHUFLES ){
-      /* Result: COLLISION
-         If we have tried to reshuffle too many times, we settle to leave the
-         hash table as it was before attempting to insert the new element, and
-         then we error out. */
-      k = original_k;
-      el_idx -= 1;
+    if ( res_count == RESIZE_ROUND && !resized){
+      /*
+         If we have tried to reshuffle and failed, then we go ahead and
+         resize the table. This should fix problems.
+       */
+      resize();
+      res_count = 0;
+      resized = true;
     }
-    for ( int i = 0; i < el_idx; i++){
-      res = insert(el_lst[i],false);
+    if(res_count == MAX_RESHUFLES){
+      k = original_k;
+      el_lst->pop();
+    }
+    for ( int i = 0; i < el_lst->number_of_elements; i++){
+      res = insert((*el_lst)[i],false);
       if ( res == COLLISION ){
         break;
       }
     }
-    if ( res_count == MAX_RESHUFLES ) break; // Result: COLLISION
 
+    // Result: COLLISION
+    if ( res_count == MAX_RESHUFLES && res == COLLISION) break;
+    
     res_count += 1;
     if( res == FINE ){
-      free(el_lst);
+      delete el_lst;
       return FINE;
     }
   }
 
   fprintf(stderr,"MAXIMUM RESHUFLES\n");
-  free(el_lst);
+  delete el_lst;
   return COLLISION;
 }
 
