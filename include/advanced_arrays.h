@@ -28,5 +28,25 @@ int generate_k(){
   return rand() % PRIME_SDD;
 }
 
+/*
+Sizes of INT data structures
+- LONG INT - 8 bytes
+- UINT48 - 6 bytes - Defined by me below
+
+- INT - 4 bytes
+- UINT - 3 bytes
+- SHORT - 2 bytes
+- BYTE - 1 byte
+ */
+
+struct uint48{
+  unsigned long long v:48;
+} __attribute__((packed));
+
+struct uint24{
+  unsigned int v:24;
+} __attribute__((packed));
+
+
 #include <assert.h>
 #endif
